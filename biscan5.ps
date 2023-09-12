@@ -1,0 +1,55 @@
+%! biscan.ps
+
+/even { 2 mod 0 eq } bind def
+/inc { dup cvx exec 1 add def } bind def
+/dec { dup cvx exec 1 sub def } bind def
+/ed { exch def } bind def
+
+/bicis { % m n a b c d
+	8 dict begin /d ed /c ed /b ed /a ed /n ed /m ed
+
+	m 2 idiv dup /m1 ed /m2 ed
+	n even m1 even and { /m1 inc /m2 dec } if
+	m1 n a b c d bitrans
+	a b rlineto
+	m2 n a b c neg d neg bitrans
+	end
+} def
+
+/bitrans { % m n a b c d
+	10 dict begin /d ed /c ed /b ed /a ed /n ed /m ed
+
+	{ % loop 
+		m 1 eq { n 1 sub { c d rlineto } repeat exit } if
+		n 1 eq { m 1 sub { a b rlineto } repeat exit } if
+
+		m n lt { % if
+			/t m def /m n def /n t def
+			/t a def /a c def /c t def
+			/t b def /b d def /d t def
+		} if 
+
+		m 2 idiv dup /m1 ed /m2 ed
+		/m4 m 4 mod def
+		{ % loop
+			m4 1 eq { /m2 inc exit } if
+			m4 2 eq { /m1 inc /m2 dec exit } if
+			m4 3 eq { /m1 inc exit } if
+			exit
+		} loop
+
+		m1 n a b c d bicis
+		a b rlineto
+		m2 n a b c d bitrans
+		exit
+	} loop 
+	end
+} def
+
+newpath 10 10 moveto
+2 setlinecap
+2 setlinejoin
+10 dup scale .5 setlinewidth
+%1 0 rlineto
+59 73 1 0 0 1 bitrans stroke
+showpage
